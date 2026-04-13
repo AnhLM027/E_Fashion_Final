@@ -1,0 +1,55 @@
+package org.example.e_fashion.controller.client;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.example.e_fashion.dto.request.CategoryRequestDTO;
+import org.example.e_fashion.dto.response.CategoryResponseDTO;
+import org.example.e_fashion.dto.response.CategoryTreeDTO;
+import org.example.e_fashion.entity.CategoryEntity;
+import org.example.e_fashion.mapper.CategoryMapper;
+import org.example.e_fashion.service.CategoryService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/categories")
+@RequiredArgsConstructor
+public class CategoryController {
+
+    private final CategoryService categoryService;
+    private final CategoryMapper categoryMapper;
+
+    @GetMapping
+    public List<CategoryResponseDTO> getAll() {
+        return categoryService.getAll()
+                .stream()
+                .map(categoryMapper::toResponse)
+                .toList();
+    }
+
+    @GetMapping("/{id}")
+    public CategoryResponseDTO getById(@PathVariable String id) {
+        return categoryMapper.toResponse(categoryService.getById(id));
+    }
+
+    @GetMapping("/root")
+    public List<CategoryResponseDTO> getRootCategories() {
+        return categoryService.getRootCategories()
+                .stream()
+                .map(categoryMapper::toResponse)
+                .toList();
+    }
+
+    @GetMapping("/tree")
+    public List<CategoryTreeDTO> getCategoryTree() {
+        return categoryService.getCategoryTree();
+    }
+
+    @GetMapping("/tree/{id}")
+    public CategoryTreeDTO getCategoryTreeById(@PathVariable String id) {
+        return categoryService.getCategoryTreeById(id);
+    }
+}

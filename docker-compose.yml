@@ -1,0 +1,48 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: e_fashion_db
+    restart: "no"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: e_fashion
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_password
+    ports:
+      - "3307:3306" # Connect locally via 3307 if needed
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./BE
+    container_name: e_fashion_backend
+    restart: "no"
+    depends_on:
+      - db
+    environment:
+      - SERVER_PORT=2000
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=e_fashion
+      - DB_USERNAME=root
+      - DB_PASSWORD=root_password
+      - JWT_SECRET=2aATAiGKfFasIR0ppV8kwBTHbXQSjB7Vzb0zq0rId4Q=
+      - JWT_EXPIRE=86400000
+    ports:
+      - "2000:2000"
+    volumes:
+      - ./BE/uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./FE
+    container_name: e_fashion_frontend
+    restart: "no"
+    depends_on:
+      - backend
+    ports:
+      - "2010:2010" # Map host port 2010 to container port 2010
+
+volumes:
+  mysql_data:
