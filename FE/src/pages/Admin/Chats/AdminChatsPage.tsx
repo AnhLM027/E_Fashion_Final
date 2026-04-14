@@ -136,7 +136,7 @@ export default function AdminChatsPage() {
         if (msg.type === "READ") {
           setMessages((prev) =>
             prev.map((m) =>
-              m.senderType === "AGENT" ? { ...m, isRead: true } : m,
+              m.senderType !== "USER" ? { ...m, isRead: true } : m,
             ),
           );
           return;
@@ -144,7 +144,7 @@ export default function AdminChatsPage() {
 
         setMessages((prev) => [...prev, msg]);
 
-        if (msg.senderType === "AGENT") {
+        if (msg.senderType === "USER") {
           try {
             await adminChatApi.markAsRead(selectedSession.id);
             loadSessions();
@@ -175,7 +175,7 @@ export default function AdminChatsPage() {
         if (msg.type === "READ") {
           setMessages((prev) =>
             prev.map((m) =>
-              m.senderType === "AGENT" ? { ...m, isRead: true } : m,
+              m.senderType !== "USER" ? { ...m, isRead: true } : m,
             ),
           );
           return;
@@ -362,7 +362,7 @@ export default function AdminChatsPage() {
 
   const lastAgentMessageIndex = [...messages]
     .reverse()
-    .findIndex((m) => m.senderType === "AGENT");
+    .findIndex((m) => m.senderType === "AGENT" || m.senderType === "BOT");
 
   const lastAgentIndex =
     lastAgentMessageIndex === -1
@@ -515,6 +515,7 @@ export default function AdminChatsPage() {
               className="flex-1 overflow-y-auto px-6 py-8 space-y-6 bg-zinc-50/30"
             >
               {messages.map((msg, index) => {
+                const isStaff = msg.senderType === "AGENT" || msg.senderType === "BOT";
                 const isAgent = msg.senderType === "AGENT";
                 const currentDate = new Date(msg.createdAt).toDateString();
                 const prevDate = index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;
@@ -530,11 +531,11 @@ export default function AdminChatsPage() {
                       </div>
                     )}
 
-                    <div className={`flex ${msg.messageType === "SYSTEM" ? "justify-center" : isAgent ? "justify-end" : "justify-start"}`}>
+                    <div className={`flex ${msg.messageType === "SYSTEM" ? "justify-center" : isStaff ? "justify-end" : "justify-start"}`}>
                       <div className={`max-w-[75%] transition-all ${
                         msg.messageType === "SYSTEM"
                           ? "px-4 py-1 text-[11px] text-zinc-400 italic bg-transparent"
-                          : isAgent
+                          : isStaff
                             ? "px-4 py-3 rounded-2xl rounded-tr-none bg-zinc-900 text-white shadow-sm"
                             : "px-4 py-3 rounded-2xl rounded-tl-none bg-white text-zinc-900 border border-zinc-200 shadow-sm"
                       }`}>
@@ -575,7 +576,7 @@ export default function AdminChatsPage() {
 
                         <div className={`text-[10px] mt-2 flex items-center justify-end ${isAgent ? "text-zinc-400" : "text-zinc-400"}`}>
                           {formatTime(msg.createdAt)}
-                          {isAgent && index === lastAgentIndex && msg.isRead && (
+                          {isStaff && index === lastAgentIndex && msg.isRead && (
                             <span className="ml-2 font-medium">• Seen</span>
                           )}
                         </div>

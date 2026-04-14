@@ -63,4 +63,9 @@ export const adminUserApi = {
   deactivate: async (id: string): Promise<void> => {
     return axiosClient.put(API_ENDPOINTS.ADMIN.DEACTIVATE_USER(id));
   },
+
+  // DELETE
+  delete: async (id: string): Promise<void> => {
+    return axiosClient.delete(API_ENDPOINTS.ADMIN.USER_ID(id));
+  },
 };

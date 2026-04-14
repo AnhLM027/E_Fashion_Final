@@ -109,4 +109,9 @@ export const chatApi = {
       }
     );
   },
+
+  // ===== AI Chat =====
+  askAi: async (sessionId: string, message: string): Promise<ChatMessage> => {
+    return axiosClient.post(API_ENDPOINTS.DISCOVERY.CHAT_AI(sessionId), { message });
+  },
 };

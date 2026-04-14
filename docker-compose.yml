@@ -29,8 +29,12 @@ services:
       - DB_PASSWORD=root_password
       - JWT_SECRET=2aATAiGKfFasIR0ppV8kwBTHbXQSjB7Vzb0zq0rId4Q=
       - JWT_EXPIRE=86400000
+      - NEXUSRAG_API_BASE=http://nexusrag-backend:8080/nexus/api/v1
     ports:
       - "2000:2000"
+    networks:
+      - default
+      - nexusrag_net
     volumes:
       - ./BE/uploads:/app/uploads
 
@@ -43,6 +47,16 @@ services:
       - backend
     ports:
       - "2010:2010" # Map host port 2010 to container port 2010
+    networks:
+      - default
+      - nexusrag_net
+
+networks:
+  default:
+    name: e_fashion_default
+  nexusrag_net:
+    external: true
+    name: nexusrag_default
 
 volumes:
   mysql_data:

@@ -137,6 +137,12 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
+        <!-- WebFlux for Reactive Streaming (AI Chat) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
         <!-- Converter -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

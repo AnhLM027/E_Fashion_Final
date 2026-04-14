@@ -34,6 +34,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/api/categories/",
             "/api/brands/",
             "/api/chat/",
+            "/api/chat/ai/",
             "/api/coupons/",
             "/api/ratings/",
             "/ws-chat/",

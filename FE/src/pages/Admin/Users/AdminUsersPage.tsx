@@ -9,7 +9,7 @@ import { logout } from "@/features/auth/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Pagination } from "@/components/ui/Pagination";
-import { Search, Shield, User, MoreVertical } from "lucide-react";
+import { Search, Shield, User, MoreVertical, Trash2 } from "lucide-react";
 import { formatDate } from "@/utils/format";
 
 const AdminUsersPage = () => {
@@ -89,6 +89,25 @@ const AdminUsersPage = () => {
     }
   };
 
+  const deleteUser = async (user: AdminUser) => {
+    if (user.id === currentUser?.id) {
+      alert("You cannot delete yourself!");
+      return;
+    }
+    const confirmDelete = window.confirm(
+      `Are you sure you want to PERMANENTLY delete user ${user.email}? This action cannot be undone.`,
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await adminUserApi.delete(user.id);
+      fetchUsers();
+    } catch (error: any) {
+      console.error("Failed to delete user", error);
+      alert(error.response?.data?.message || "Failed to delete user. The user might have related records (orders, etc.) that prevent deletion.");
+    }
+  };
+
   const columns = useMemo<Column<AdminUser>[]>(() => [
     {
       key: "email",
@@ -138,13 +157,12 @@ const AdminUsersPage = () => {
       key: "isActive",
       header: "Status",
       render: (u) => (
-        <div 
+        <div
           onClick={() => toggleActive(u)}
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium cursor-pointer transition-all ${
-            u.isActive 
-              ? "bg-green-50 text-green-700 hover:bg-green-100" 
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium cursor-pointer transition-all ${u.isActive
+              ? "bg-green-50 text-green-700 hover:bg-green-100"
               : "bg-rose-50 text-rose-600 hover:bg-rose-100"
-          }`}
+            }`}
         >
           <div className={`w-1.5 h-1.5 rounded-full ${u.isActive ? "bg-green-500" : "bg-rose-500 animate-pulse"}`} />
           {u.isActive ? "Active" : "Locked"}
@@ -160,10 +178,26 @@ const AdminUsersPage = () => {
       key: "actions",
       header: "",
       align: "right",
-      render: () => (
-        <button className="p-2 hover:bg-zinc-100 rounded-lg transition text-zinc-400 hover:text-zinc-900">
-          <MoreVertical size={16} />
-        </button>
+      render: (u) => (
+        <div className="flex items-center justify-end gap-2">
+          <div className="group relative">
+            <button className="p-2 hover:bg-zinc-100 rounded-lg transition text-zinc-400 hover:text-zinc-900">
+              <MoreVertical size={16} />
+            </button>
+            <div className="absolute right-0 top-full mt-1 w-48 bg-white shadow-2xl rounded-xl border border-zinc-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+              <div className="py-2 border-b border-zinc-50 px-4">
+                <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">User Actions</p>
+              </div>
+              <button
+                onClick={() => deleteUser(u)}
+                className="w-full text-left px-4 py-3 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-2"
+              >
+                <Trash2 size={14} />
+                Permanently Delete User
+              </button>
+            </div>
+          </div>
+        </div>
       )
     }
   ], [currentUser, users]);
@@ -175,7 +209,7 @@ const AdminUsersPage = () => {
           <h1 className="text-2xl font-bold text-zinc-900">Users</h1>
           <p className="text-sm text-zinc-500">Manage administrative and customer accounts</p>
         </div>
-        
+
         {/* FILTERS */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative group">
@@ -194,7 +228,7 @@ const AdminUsersPage = () => {
           <div className="flex items-center gap-2 bg-zinc-50 p-1 rounded-lg border border-zinc-200">
             <select
               className="bg-transparent border-none text-xs font-semibold px-3 py-1.5 focus:ring-0 cursor-pointer"
-               value={roleFilter}
+              value={roleFilter}
               onChange={(e) => {
                 setPage(0);
                 setRoleFilter(e.target.value);
@@ -205,12 +239,12 @@ const AdminUsersPage = () => {
               <option value="STAFF">Staff</option>
               <option value="CUSTOMER">Customer</option>
             </select>
-            
+
             <div className="w-px h-4 bg-zinc-200" />
 
             <select
               className="bg-transparent border-none text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 focus:ring-0 cursor-pointer"
-               value={activeFilter}
+              value={activeFilter}
               onChange={(e) => {
                 setPage(0);
                 setActiveFilter(e.target.value);
@@ -224,14 +258,14 @@ const AdminUsersPage = () => {
         </div>
       </div>
 
-      <DataTable 
+      <DataTable
         data={users}
         columns={columns}
         loading={loading}
         emptyMessage="No users matching your criteria"
       />
 
-      <Pagination 
+      <Pagination
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}

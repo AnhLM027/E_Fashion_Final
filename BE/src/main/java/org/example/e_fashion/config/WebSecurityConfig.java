@@ -39,6 +39,7 @@ public class WebSecurityConfig {
                                 "/api/coupons/**",
                                 "/api/ratings/**",
                                 "/api/chat/**",
+                                "/api/customer/ai-chat/**",
                                 "/ws-chat/**",
                                 "/uploads/**")
                         .permitAll()

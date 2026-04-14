@@ -128,6 +128,7 @@ export const API_ENDPOINTS = {
     CHAT_READ: (sessionId: string) => `/api/chat/sessions/${sessionId}/read`,
     CHAT_MERGE: '/api/chat/merge',
     CHAT_FEEDBACK: (sessionId: string) => `/api/chat/${sessionId}/feedback`,
+    CHAT_AI: (sessionId: string) => `/api/chat/ai/${sessionId}`,
   },
 
   // Các endpoint tiện ích khác

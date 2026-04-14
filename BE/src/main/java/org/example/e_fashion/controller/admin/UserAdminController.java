@@ -45,4 +45,9 @@ public class UserAdminController {
     public void activate(@PathVariable String id) {
         adminUserService.activateUser(id);
     }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id) {
+        adminUserService.deleteUser(id);
+    }
 }

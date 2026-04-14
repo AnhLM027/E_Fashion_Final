@@ -93,4 +93,12 @@ public class AdminUserServiceImpl implements AdminUserService {
         user.setIsActive(true);
         userRepository.save(user);
     }
+
+    @Override
+    public void deleteUser(String id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found");
+        }
+        userRepository.deleteById(id);
+    }
 }

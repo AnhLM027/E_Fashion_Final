@@ -24,4 +24,6 @@ public interface AdminUserService {
     void deactivateUser(String id);
 
     void activateUser(String id);
+
+    void deleteUser(String id);
 }

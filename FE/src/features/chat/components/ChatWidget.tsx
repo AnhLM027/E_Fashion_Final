@@ -33,10 +33,12 @@ export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const [isAiMode, setIsAiMode] = useState(true);
+  const [isTyping, setIsTyping] = useState(false);
+
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [zoomImage, setZoomImage] = useState<string | null>(null);
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const messageEndRef = useRef<HTMLDivElement | null>(null);
@@ -97,7 +99,7 @@ export default function ChatWidget() {
               sessionId,
               ChatSenderType.BOT,
               ChatMessageType.TEXT,
-              "Xin chào 👋 E-Fashion có thể hỗ trợ gì cho bạn hôm nay?",
+              "Xin chào 👋 Tôi là trợ lý AI của E-Fashion. Tôi có bản ghi về sản phẩm và các đơn hàng gần đây, tôi có thể hỗ trợ gì cho bạn?",
             ),
           ]);
         } else {
@@ -134,10 +136,14 @@ export default function ChatWidget() {
           return;
         }
 
-        setMessages((prev) => [...prev, msg]);
+        setMessages((prev) => {
+          // Avoid duplicates if we already added it via REST call
+          if (prev.find(p => p.id === msg.id)) return prev;
+          return [...prev, msg];
+        });
 
         // Dùng openRef.current để check trạng thái đóng/mở
-        if (msg.senderType === ChatSenderType.AGENT) {
+        if (msg.senderType === ChatSenderType.AGENT || msg.senderType === ChatSenderType.BOT) {
           if (openRef.current) {
             await chatApi.markAsRead(sessionId);
             setUnreadCount(0);
@@ -179,7 +185,7 @@ export default function ChatWidget() {
         await chatApi.markAsRead(sessionId);
         setMessages((prev) =>
           prev.map((m) =>
-            m.senderType === ChatSenderType.AGENT ? { ...m, isRead: true } : m,
+            m.senderType === ChatSenderType.AGENT || m.senderType === ChatSenderType.BOT ? { ...m, isRead: true } : m,
           ),
         );
         setUnreadCount(0);
@@ -254,11 +260,15 @@ export default function ChatWidget() {
     const currentSessionId = await ensureSession();
     if (!currentSessionId) return;
 
-    const isReady = await waitForSocket();
-    if (isReady) {
-      action(currentSessionId);
+    if (!isAiMode) {
+      const isReady = await waitForSocket();
+      if (isReady) {
+        action(currentSessionId);
+      } else {
+        console.error("Socket connection timeout");
+      }
     } else {
-      console.error("Socket connection timeout");
+      action(currentSessionId);
     }
   };
 
@@ -267,13 +277,33 @@ export default function ChatWidget() {
     const content = input; // Giữ lại giá trị để xóa input sớm cho UX mượt
     setInput("");
 
-    await performChatAction((sid) => {
-      sendMessage({
-        sessionId: sid,
-        senderType: ChatSenderType.USER,
-        messageType: ChatMessageType.TEXT,
-        content: content,
-      });
+    await performChatAction(async (sid) => {
+      if (isAiMode) {
+        // AI MODE: Use REST API
+        setIsTyping(true);
+        try {
+          // Add user message locally first
+          const userMsg = createLocalMessage(sid, ChatSenderType.USER, ChatMessageType.TEXT, content);
+          setMessages(prev => [...prev, userMsg]);
+
+          await chatApi.askAi(sid, content);
+          // The response will come back through either the REST return OR the WebSocket
+          // In my AiChatController I'm doing both, but WebSocket will catch it.
+        } catch (error) {
+          console.error("AI Error", error);
+          // setMessages(prev => [...prev, createLocalMessage(sid, ChatSenderType.BOT, ChatMessageType.TEXT, "Xin lỗi, đã có lỗi xảy ra khi kết nối với AI. Bạn có thể thử lại hoặc chuyển sang chat với nhân viên.")]);
+        } finally {
+          setIsTyping(false);
+        }
+      } else {
+        // HUMAN MODE: Use WebSocket
+        sendMessage({
+          sessionId: sid,
+          senderType: ChatSenderType.USER,
+          messageType: ChatMessageType.TEXT,
+          content: content,
+        });
+      }
     });
   };
 
@@ -325,7 +355,7 @@ export default function ChatWidget() {
   const renderMessageContent = (m: any) => {
     switch (m.messageType) {
       case ChatMessageType.TEXT:
-        return <div>{m.content}</div>;
+        return <div className="whitespace-pre-wrap">{m.content}</div>;
 
       case ChatMessageType.IMAGE:
         return (
@@ -404,7 +434,7 @@ export default function ChatWidget() {
         );
 
       default:
-        return <div>{m.content}</div>;
+        return <div className="whitespace-pre-wrap">{m.content}</div>;
     }
   };
 
@@ -466,12 +496,25 @@ export default function ChatWidget() {
       {open && (
         <div className="fixed bottom-24 right-6 z-30 w-96 h-120 bg-white shadow-2xl rounded-3xl flex flex-col overflow-hidden border">
           {/* Header */}
-          <div className="bg-black text-white p-4 flex justify-between">
-            <div>
-              <div className="font-semibold text-sm">E-Fashion Support</div>
-              <div className="text-xs text-green-400">Online</div>
+          <div className="bg-black text-white p-4 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <div>
+                <div className="font-semibold text-sm">E-Fashion {isAiMode ? "AI" : "Support"}</div>
+                <div className="text-[10px] text-green-400 flex items-center gap-1">
+                  <span className="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  {isAiMode ? "AI Assistant Ready" : "Online"}
+                </div>
+              </div>
             </div>
-            <button onClick={() => setOpen(false)}>✕</button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsAiMode(!isAiMode)}
+                className={`text-[10px] px-2 py-1 rounded-full border transition-colors ${isAiMode ? 'bg-white text-black' : 'bg-transparent text-white'}`}
+              >
+                {isAiMode ? "Chat nhân viên" : "Dùng AI Assistant"}
+              </button>
+              <button onClick={() => setOpen(false)}>✕</button>
+            </div>
           </div>
 
           {/* Messages */}
@@ -502,16 +545,15 @@ export default function ChatWidget() {
 
                   {/* Message */}
                   <div
-                    className={`flex ${
-                      isSystem
+                    className={`flex ${isSystem
                         ? "justify-center"
                         : isUser
                           ? "justify-end"
                           : "justify-start"
-                    }`}
+                      }`}
                   >
                     <div
-                      className={`max-w-[75%] px-4 py-2 text-sm rounded-2xl shadow
+                      className={`max-w-[85%] px-4 py-2 text-sm rounded-2xl shadow
     ${isSystem ? "" : isUser ? "bg-black text-white" : "bg-white border"}`}
                     >
                       {m.messageType === "SYSTEM" ? (
@@ -540,6 +582,17 @@ export default function ChatWidget() {
                 </div>
               );
             })}
+
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="bg-white border px-4 py-2 rounded-2xl shadow flex gap-1">
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                </div>
+              </div>
+            )}
+
             <div ref={messageEndRef} />
           </div>
 

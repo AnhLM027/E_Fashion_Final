@@ -18,7 +18,7 @@ export interface AdminChatSession {
 export interface AdminChatMessage {
     id: string;
     sessionId: string;
-    senderType: "USER" | "AGENT";
+    senderType: "USER" | "AGENT" | "BOT";
     messageType: "TEXT" | "IMAGE" | "FILE" | "PRODUCT" | "ORDER" | "SYSTEM";
     metadata?: any;
     content: string;
