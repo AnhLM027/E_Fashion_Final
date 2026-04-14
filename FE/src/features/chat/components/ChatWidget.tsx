@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Image } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import {
   connectChat,
   subscribeSession,
@@ -353,9 +354,33 @@ export default function ChatWidget() {
   };
 
   const renderMessageContent = (m: any) => {
+    const isUser = m.senderType === ChatSenderType.USER;
+    
     switch (m.messageType) {
       case ChatMessageType.TEXT:
-        return <div className="whitespace-pre-wrap">{m.content}</div>;
+        return (
+          <div className={`prose prose-sm max-w-none ${isUser ? "prose-invert text-white" : "text-gray-800"}`}>
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                ul: ({ children }) => <ul className="list-none p-0 m-0 space-y-1">{children}</ul>,
+                li: ({ children }) => (
+                  <li className="flex items-start gap-2 m-0 p-0 text-[13px]">
+                    {!isUser && <span className="text-black mt-1">•</span>}
+                    <div className="flex-1">{children}</div>
+                  </li>
+                ),
+                strong: ({ children }) => (
+                  <strong className={`${isUser ? "text-white" : "text-black font-bold"}`}>
+                    {children}
+                  </strong>
+                ),
+              }}
+            >
+              {m.content}
+            </ReactMarkdown>
+          </div>
+        );
 
       case ChatMessageType.IMAGE:
         return (

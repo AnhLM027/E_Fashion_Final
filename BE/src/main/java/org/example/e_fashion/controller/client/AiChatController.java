@@ -59,7 +59,7 @@ public class AiChatController {
         }
         
         // 3. Call AiChatService (non-streaming for this simple endpoint)
-        return aiChatService.streamChat(userMessage, aiHistory)
+        return aiChatService.streamChat(sessionId, userMessage, aiHistory)
                 .collectList()
                 .map(list -> {
                     StringBuilder fullText = new StringBuilder();
@@ -67,17 +67,25 @@ public class AiChatController {
 
                     for (String chunk : list) {
                         try {
-                            JsonNode node = objectMapper.readTree(chunk);
+                            // Xử lý nếu chunk chứa tiền tố SSE "data: "
+                            String json = chunk;
+                            if (json.startsWith("data: ")) {
+                                json = json.substring(6).trim();
+                            }
+                            
+                            if (json.equals("[DONE]") || json.isEmpty()) continue;
+
+                            JsonNode node = objectMapper.readTree(json);
+                            // Event 'token' trả về text
                             if (node.has("text")) {
                                 fullText.append(node.get("text").asText());
                             }
+                            // Event 'complete' trả về answer cuối cùng
                             if (node.has("answer")) {
                                 finalAnswer = node.get("answer").asText();
                             }
                         } catch (IOException e) {
-                            log.warn("Failed to parse AI chunk: {}", chunk);
-                            // If not JSON, maybe it's raw text?
-                            // fullText.append(chunk); 
+                            log.warn("Failed to parse RAG chunk: {}", chunk);
                         }
                     }
                     return (finalAnswer != null && !finalAnswer.isEmpty()) ? finalAnswer : fullText.toString();

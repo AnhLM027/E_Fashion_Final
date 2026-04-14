@@ -30,16 +30,18 @@ public class AiChatService {
     /**
      * Gửi tin nhắn tới AI Bot (NexusRAG) và nhận phản hồi streaming
      */
-    public Flux<String> streamChat(String message, List<Map<String, String>> history) {
-        String url = String.format("%s/rag/chat/%s/stream", nexusRagApiBase, workspaceId);
+    public Flux<String> streamChat(String sessionId, String query, List<Map<String, String>> history) {
+        String url = String.format("%s/chat/stream", nexusRagApiBase);
 
         Map<String, Object> body = new HashMap<>();
-        body.put("message", message);
+        body.put("userId", sessionId);
+        body.put("source", workspaceId);
+        body.put("text", query);
         body.put("history", history != null ? history : List.of());
-        body.put("mode", "hybrid");
-        body.put("top_k", 8);
+        body.put("think", false); // Mặc định tắt để phản hồi nhanh
+        body.put("search", false); // Tùy chọn search
 
-        log.info("Calling NexusRAG Stream API: {}", url);
+        log.info("Calling RAG Stream API: {}", url);
 
         return webClient.post()
                 .uri(url)
@@ -48,6 +50,6 @@ public class AiChatService {
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
                 .bodyToFlux(String.class)
-                .doOnError(e -> log.error("Error streaming from NexusRAG (URL: {}): {}", url, e.getMessage()));
+                .doOnError(e -> log.error("Error streaming from RAG (URL: {}): {}", url, e.getMessage()));
     }
 }

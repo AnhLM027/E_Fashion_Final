@@ -1,0 +1,37 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+ENV/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+nohup.out
+worker.log
+app.log
+backend.log
+
+# Project specific
+email.txt
+self_documents/
+.claude/
+uploads/
+app/docs/legacy/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

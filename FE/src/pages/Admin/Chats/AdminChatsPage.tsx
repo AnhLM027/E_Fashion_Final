@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Image, Search } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import {
   connectChat,
   subscribeSession,
@@ -570,7 +571,29 @@ export default function AdminChatsPage() {
                             case "SYSTEM":
                               return <div className="text-center">{msg.content}</div>;
                             default:
-                              return <div className="leading-relaxed text-[13px]">{msg.content}</div>;
+                              return (
+                                <div className={`prose prose-sm max-w-none ${isStaff ? "prose-invert text-white" : "text-zinc-900 border-zinc-200"}`}>
+                                  <ReactMarkdown
+                                    components={{
+                                      p: ({ children }) => <p className="mb-1.5 last:mb-0 leading-relaxed text-[13px]">{children}</p>,
+                                      ul: ({ children }) => <ul className="list-none p-0 m-0 space-y-1">{children}</ul>,
+                                      li: ({ children }) => (
+                                        <li className="flex items-start gap-2 m-0 p-0 text-[13px]">
+                                          <span className={`${isStaff ? "text-white/60" : "text-zinc-400"} mt-1 shrink-0`}>•</span>
+                                          <div className="flex-1">{children}</div>
+                                        </li>
+                                      ),
+                                      strong: ({ children }) => (
+                                        <strong className={`${isStaff ? "text-white font-bold" : "text-zinc-900 font-bold"}`}>
+                                          {children}
+                                        </strong>
+                                      ),
+                                    }}
+                                  >
+                                    {msg.content}
+                                  </ReactMarkdown>
+                                </div>
+                              );
                           }
                         })()}
 

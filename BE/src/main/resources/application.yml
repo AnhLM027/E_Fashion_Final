@@ -28,3 +28,9 @@ jwt:
 
 file:
   upload-dir: ${UPLOAD_DIR:uploads/}
+
+nexusrag:
+  api:
+    base: ${NEXUSRAG_API_BASE:http://localhost:4560/api/v1}
+  workspace:
+    id: ${NEXUSRAG_WORKSPACE_ID:10}

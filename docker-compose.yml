@@ -9,9 +9,11 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: user_password
     ports:
-      - "3307:3306" # Connect locally via 3307 if needed
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - e_fashion_network
 
   backend:
     build:
@@ -29,14 +31,14 @@ services:
       - DB_PASSWORD=root_password
       - JWT_SECRET=2aATAiGKfFasIR0ppV8kwBTHbXQSjB7Vzb0zq0rId4Q=
       - JWT_EXPIRE=86400000
-      - NEXUSRAG_API_BASE=http://nexusrag-backend:8080/nexus/api/v1
+      - NEXUSRAG_API_BASE=http://rag-backend:4560/api/v1
+      - NEXUSRAG_WORKSPACE_ID=10
     ports:
       - "2000:2000"
-    networks:
-      - default
-      - nexusrag_net
     volumes:
       - ./BE/uploads:/app/uploads
+    networks:
+      - e_fashion_network
 
   frontend:
     build:
@@ -46,17 +48,84 @@ services:
     depends_on:
       - backend
     ports:
-      - "2010:2010" # Map host port 2010 to container port 2010
+      - "2010:2010"
     networks:
-      - default
-      - nexusrag_net
+      - e_fashion_network
+
+  # ==========================================
+  # RAG SYSTEM SERVICES
+  # ==========================================
+  rag-backend:
+    build:
+      context: ./RAG
+    container_name: e_fashion_rag_backend
+    restart: "no"
+    depends_on:
+      - rag-db
+      - rag-qdrant
+      - rag-mongo
+      - rag-neo4j
+    env_file:
+      - ./RAG/.env
+    ports:
+      - "4560:4560"
+    volumes:
+      - ./RAG/data_mba_large:/app/data_mba_large
+    networks:
+      - e_fashion_network
+
+  rag-db:
+    image: postgres:15
+    container_name: e_fashion_rag_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=e_fashion_rag
+    ports:
+      - "2346:5432"
+    volumes:
+      - rag_postgres_data:/var/lib/postgresql/data
+    networks:
+      - e_fashion_network
+
+  rag-qdrant:
+    image: qdrant/qdrant
+    container_name: e_fashion_rag_qdrant
+    ports:
+      - "6334:6333"
+    volumes:
+      - rag_qdrant_data:/qdrant/storage
+    networks:
+      - e_fashion_network
+
+  rag-mongo:
+    image: mongo:6.0
+    container_name: e_fashion_rag_mongo
+    volumes:
+      - rag_mongo_data:/data/db
+    networks:
+      - e_fashion_network
+
+  rag-neo4j:
+    image: neo4j:5.12
+    container_name: e_fashion_rag_neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/password123
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - rag_neo4j_data:/data
+    networks:
+      - e_fashion_network
 
 networks:
-  default:
-    name: e_fashion_default
-  nexusrag_net:
-    external: true
-    name: nexusrag_default
+  e_fashion_network:
+    driver: bridge
 
 volumes:
   mysql_data:
+  rag_postgres_data:
+  rag_qdrant_data:
+  rag_mongo_data:
+  rag_neo4j_data:

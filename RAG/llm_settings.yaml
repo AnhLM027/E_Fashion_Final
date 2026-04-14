@@ -1,0 +1,50 @@
+active_profile: "gemini_cloud" # Lựa chọn: gemini_cloud, qwen_local, openai_api
+
+# Cấu hình Pipeline (NexusRAG & Knowledge Graph)
+pipeline:
+  chunk_max_tokens: 1024
+  document_parser: "docling"
+  min_relevance_score: 0.1
+  reranker_top_k: 8
+  enable_kg: true
+  kg_language: "Vietnamese"
+  kg_entity_types: [
+    "Organization", "Person", "Product", "Location", "Event",
+    "Financial_Metric", "Technology", "Date", "Regulation",
+    "Document", "Concept", "Course"
+  ]
+  kg_chunk_token_size: 1200
+  enable_image_extraction: true
+  max_images_per_doc: 20
+
+profiles:
+  gemini_cloud:
+    provider: "gemini"
+    api_key: "AIzaSyAxTTfo92WdcFuIEEfKDWZ0wlA9aPjKxrE"
+    model: "gemini-2.5-flash"
+    model_fast: "gemini-2.5-flash"
+    embedding_provider: "sentence_transformers"
+    embedding_model: "BAAI/bge-m3"
+    max_tokens: 8192
+    max_async: 10
+
+  qwen_local:
+    provider: "openai"
+    api_base: "http://171.226.10.154:8080/v1"
+    api_key: "none"
+    model: "Qwen/Qwen3-32B-AWQ"
+    model_fast: "Qwen/Qwen3-32B-AWQ"
+    embedding_provider: "sentence_transformers"
+    embedding_model: "BAAI/bge-m3"
+    thinking_level: "medium"
+    max_tokens: 4096
+    max_async: 1 # Set to 1 for slow local servers to avoid retries
+
+  openai_api:
+    provider: "openai"
+    api_key: "your-openai-key-here"
+    model: "gpt-4o-mini"
+    model_fast: "gpt-4o-mini"
+    embedding_provider: "openai"
+    embedding_model: "text-embedding-3-small"
+    thinking_level: "low"
