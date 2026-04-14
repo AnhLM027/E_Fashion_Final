@@ -84,7 +84,7 @@ export default function OrderDetailPage() {
       try {
         const res = await orderApi.getOrderById(orderId!);
         setOrder(res);
-        await fetchRatings(res.items);
+        await fetchRatings(res.orderId);
       } catch (err) {
         console.error(err);
       } finally {

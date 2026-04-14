@@ -6,7 +6,7 @@ interface Props {
 }
 
 const DEFAULT_AVATAR =
-  "https://scontent.fhan15-2.fna.fbcdn.net/v/t39.30808-6/637216310_893488796743758_6656880761301265229_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=1d70fc&_nc_eui2=AeFT2sIkHQLA56dxN15snSosOCqPeRT0WCA4Ko95FPRYIOaNJP30Pmtgbt4aAHti6G0VIrg96lhfSCzunzI0UZFs&_nc_ohc=OhpBNj_OhVMQ7kNvwEqk8a9&_nc_oc=Adly1N7KsUzdUF8oE9j9gVgNf9yD8MqWBJYwmpz6a9lB35KkVTmfqQy-CmroXgxJ1i0&_nc_zt=23&_nc_ht=scontent.fhan15-2.fna&_nc_gid=LxQXKWC4Lg_rhV-ZzzYNaw&_nc_ss=8&oh=00_AfzZ2QiSAM0Bt9y3bG4PXHBMWGjZdUiPcMcHGIX-Lwxx_Q&oe=69BC4719";
+  "https://ui-avatars.com/api/?background=random&color=fff&name=U";
 
 export function ProductRatings({ productId }: Props) {
   const { ratings, loading, hasMore, loadMore } = useRatings(productId);
@@ -76,12 +76,10 @@ export function ProductRatings({ productId }: Props) {
           return (
             <div key={r.id} className="border-b pb-8 last:border-none">
               <div className="flex gap-4">
-                {/* AVATAR */}
-                <img
-                  src={DEFAULT_AVATAR}
-                  alt="avatar"
-                  className="w-11 h-11 rounded-full object-cover"
-                />
+                {/* INITIALS AVATAR */}
+                <div className="w-11 h-11 rounded-full bg-zinc-100 flex items-center justify-center text-sm font-semibold text-zinc-600 uppercase flex-shrink-0">
+                  {name.charAt(0)}
+                </div>
 
                 <div className="flex-1">
                   {/* NAME + DATE */}

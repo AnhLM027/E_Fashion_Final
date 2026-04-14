@@ -3,6 +3,7 @@ import {
   type StompSubscription,
   type IMessage,
 } from "@stomp/stompjs";
+import { WS_BASE_URL } from "@/config/api.config";
 
 let client: Client | null = null;
 
@@ -13,7 +14,7 @@ export const connectChat = (
   onConnected?: (client: Client) => void
 ): Client => {
   client = new Client({
-    brokerURL: "ws://localhost:2000/ws-chat",
+    brokerURL: WS_BASE_URL,
     reconnectDelay: 5000,
   });
 

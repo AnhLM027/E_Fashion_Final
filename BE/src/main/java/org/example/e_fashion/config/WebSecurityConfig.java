@@ -47,6 +47,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         // STAFF & ADMIN (Store management)
+                        .requestMatchers("/api/staff/chat/upload").permitAll() // TEMPORARY FOR DEBUGGING
                         .requestMatchers("/api/staff/**").hasAnyRole("ADMIN", "STAFF")
 
                         // CUSTOMER (Personal actions)

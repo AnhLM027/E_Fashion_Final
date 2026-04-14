@@ -45,13 +45,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletRequest request) {
         LoginResponseDTO response = authService.login(loginRequestDTO);
+
+        boolean isSecure = request.isSecure() || request.getHeader("X-Forwarded-Proto") != null && request.getHeader("X-Forwarded-Proto").equals("https");
 
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", response.getAccessToken())
                 .httpOnly(true)
                 .path("/")
-                .secure(false)
+                .secure(isSecure)
                 .sameSite("Lax")
                 .maxAge(jwtTokenUtils.getRemainingExpiration(response.getAccessToken()))
                 .build();
@@ -59,7 +61,7 @@ public class AuthController {
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", response.getRefreshToken())
                 .httpOnly(true)
                 .path("/")
-                .secure(false)
+                .secure(isSecure)
                 .sameSite("Lax")
                 .maxAge(jwtTokenUtils.getRemainingExpiration(response.getRefreshToken()))
                 .build();
@@ -71,7 +73,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@CookieValue(name = "refreshToken") String refreshToken) {
+    public ResponseEntity<?> refresh(@CookieValue(name = "refreshToken") String refreshToken, HttpServletRequest request) {
 
         String username = jwtTokenUtils.extractUsername(refreshToken);
         System.out.println("Username: " + username);
@@ -84,10 +86,12 @@ public class AuthController {
 
         String newAccessToken = jwtTokenUtils.generateAccessToken(userDetails);
 
+        boolean isSecure = request.isSecure() || request.getHeader("X-Forwarded-Proto") != null && request.getHeader("X-Forwarded-Proto").equals("https");
+
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
                 .httpOnly(true)
                 .path("/")
-                .secure(false)
+                .secure(isSecure)
                 .sameSite("Lax")
                 .maxAge(jwtTokenUtils.getRemainingExpiration(newAccessToken))
                 .build();
@@ -101,10 +105,12 @@ public class AuthController {
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         request.getSession().invalidate();
 
+        boolean isSecure = request.isSecure() || request.getHeader("X-Forwarded-Proto") != null && request.getHeader("X-Forwarded-Proto").equals("https");
+
         ResponseCookie deleteAccess = ResponseCookie.from("accessToken", "")
                 .httpOnly(true)
                 .path("/")
-                .secure(false)
+                .secure(isSecure)
                 .sameSite("Lax")
                 .maxAge(0)
                 .build();
@@ -112,7 +118,7 @@ public class AuthController {
         ResponseCookie deleteRefresh = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .path("/")
-                .secure(false)
+                .secure(isSecure)
                 .sameSite("Lax")
                 .maxAge(0)
                 .build();

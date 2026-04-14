@@ -32,7 +32,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/api/products/",
             "/api/product-variants/",
             "/api/categories/",
-            "/api/brands/"
+            "/api/brands/",
+            "/api/chat/",
+            "/api/coupons/",
+            "/api/ratings/",
+            "/ws-chat/",
+            "/uploads/",
+            "/api/staff/chat/upload"
     );
 
     @Override
@@ -92,11 +98,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     private String extractAccessToken(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
+        // 1. Try Header
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
 
-        for (Cookie cookie : request.getCookies()) {
-            if ("accessToken".equals(cookie.getName())) {
-                return cookie.getValue();
+        // 2. Try Cookie
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
             }
         }
         return null;

@@ -2,6 +2,7 @@ package org.example.e_fashion.controller.client;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.e_fashion.config.FileStorageConfig;
 import org.example.e_fashion.dto.response.ChatMessageResponseDTO;
 import org.example.e_fashion.dto.response.ChatSessionResponseDTO;
@@ -16,12 +17,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
+@Slf4j
 public class ChatController {
 
     private final ChatService chatService;
@@ -108,33 +114,46 @@ public class ChatController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String uploadChatFile(@RequestParam("file") MultipartFile file)
             throws IOException {
+        log.info("Starting file upload (Client): originalFilename={}", file.getOriginalFilename());
 
-        System.out.println(file);
         if (file.isEmpty()) {
+            log.error("Upload failed: File is empty");
             throw new RuntimeException("File is empty");
         }
 
         // Validate image only
         String contentType = file.getContentType();
+        log.info("File content type: {}", contentType);
         if (contentType == null || !contentType.startsWith("image/")) {
+            log.warn("Upload failed: Only image files are allowed. Current type: {}", contentType);
             throw new RuntimeException("Only image files are allowed");
         }
 
-        String uploadDir = fileStorageConfig.getUploadDir() + "/chat";
-        File directory = new File(uploadDir);
+        String uploadDirStr = fileStorageConfig.getUploadDir() + "/chat";
+        Path uploadPath = Paths.get(uploadDirStr).toAbsolutePath().normalize();
+        File directory = uploadPath.toFile();
 
         if (!directory.exists()) {
+            log.info("Creating directory for chat uploads: {}", uploadPath);
             directory.mkdirs();
         }
 
         String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
         String fileName = UUID.randomUUID() + "." + extension;
 
-        File dest = new File(directory, fileName);
-        file.transferTo(dest);
+        Path destPath = uploadPath.resolve(fileName);
+        log.info("Saving file to: {}", destPath);
+        
+        try {
+            Files.copy(file.getInputStream(), destPath, StandardCopyOption.REPLACE_EXISTING);
+            log.info("File uploaded successfully. Relative path: /style/uploads/chat/{}", fileName);
+        } catch (IOException e) {
+            log.error("Failed to save file {}: {}", fileName, e.getMessage());
+            throw e;
+        }
 
-        // Trả về URL public
-        return "http://localhost:2000/uploads/chat/" + fileName;
+        // Trả về URL relative
+        return "/style/uploads/chat/" + fileName;
     }
 
     @PostMapping("/sessions/{sessionId}/read")

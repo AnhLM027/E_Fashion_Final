@@ -1,4 +1,5 @@
 export const API_BASE_URL = '/style';
+export const WS_BASE_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}${API_BASE_URL}/ws-chat`;
 
 export const API_ENDPOINTS = {
   // 📂 1. Luồng ADMIN (ROLE_ADMIN)
@@ -36,7 +37,7 @@ export const API_ENDPOINTS = {
     EXPORT_ORDERS: '/api/staff/orders/export',
     RATINGS: '/api/staff/ratings',
     RATING_ID: (id: string) => `/api/staff/ratings/${id}`,
-    
+
     PRODUCTS: '/api/staff/products',
     PRODUCT_ID: (id: string) => `/api/staff/products/${id}`,
     PRODUCT_STATUS: (id: string) => `/api/staff/products/${id}/status`,
@@ -48,7 +49,7 @@ export const API_ENDPOINTS = {
     CHAT_CLOSE: (sessionId: string) => `/api/staff/chat/sessions/${sessionId}/close`,
     CHAT_READ: (sessionId: string) => `/api/staff/chat/sessions/${sessionId}/read`,
     CHAT_UPLOAD: '/api/staff/chat/upload',
-    
+
     BRANDS: '/api/staff/brands',
     // Giám sát categories (Read)
     CATEGORIES: '/api/staff/categories',
@@ -84,7 +85,7 @@ export const API_ENDPOINTS = {
     WISHLIST: '/api/customer/wishlist',
     WISHLIST_ID: (id: string) => `/api/customer/wishlist/${id}`,
     RATINGS: '/api/customer/ratings',
-    RATINGS_ORDER: (orderId: string) => `/api/customer/ratings/order/${orderId}`,
+    RATINGS_ORDER: (orderId: string) => `/api/ratings/order/${orderId}`,
     RATING_ID: (id: string) => `/api/customer/ratings/${id}`,
   },
 

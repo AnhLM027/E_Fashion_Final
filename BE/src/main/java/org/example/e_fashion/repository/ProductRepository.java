@@ -59,11 +59,16 @@ public interface ProductRepository extends JpaRepository<ProductEntity, String> 
     );
 
     @Query("""
-    SELECT p FROM ProductEntity p
-    WHERE p.isActive = true
+    SELECT DISTINCT p FROM ProductEntity p
+    LEFT JOIN p.brand b
+    LEFT JOIN p.category c
+    WHERE p.deletedAt IS NULL
+    AND p.isActive = true
     AND (
         LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
         OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(b.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
     )
 """)
     List<ProductEntity> search(@Param("keyword") String keyword, Pageable pageable);

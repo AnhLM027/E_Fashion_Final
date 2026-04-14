@@ -20,6 +20,8 @@ import { fetchCart } from "@/features/cart/slices/cartSlice";
 import { useCategoryTree, type Category } from "@/hooks/useCategoryTree";
 import type { RootState, AppDispatch } from "@/store/store";
 import { cn } from "@/lib/utils";
+import axiosClient from "@/lib/axiosClient";
+import { API_ENDPOINTS } from "@/config/api.config";
 
 export function Header() {
   const dispatch = useDispatch<AppDispatch>();
@@ -57,11 +59,10 @@ export function Header() {
     const delay = setTimeout(async () => {
       try {
         setLoadingSearch(true);
-        const res = await fetch(
-          `http://localhost:2000/api/products/search?keyword=${encodeURIComponent(keyword)}`,
-        );
-        const data = await res.json();
-        setSuggestions(data);
+        const res = await axiosClient.get(API_ENDPOINTS.DISCOVERY.PRODUCTS.SEARCH, {
+          params: { keyword }
+        });
+        setSuggestions(res);
         setShowDropdown(true);
       } catch (err) {
         console.error(err);

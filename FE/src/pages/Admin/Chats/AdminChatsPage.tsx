@@ -398,8 +398,8 @@ export default function AdminChatsPage() {
         {/* Header */}
         <div className="p-4 border-b border-zinc-200 bg-white">
           <h2 className="text-lg font-bold text-zinc-900 leading-none">Chats</h2>
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1.5 leading-none">
-            {sessions.length} ACTIVE SESSIONS
+          <p className="text-xs text-zinc-500 font-medium mt-1.5 leading-none">
+            {sessions.length} active sessions
           </p>
         </div>
 
@@ -452,7 +452,7 @@ export default function AdminChatsPage() {
                     >
                       {displayName}
                     </div>
-                    <div className="text-[10px] font-bold text-zinc-400 flex shrink-0 ml-2">
+                    <div className="text-xs text-zinc-400 flex shrink-0 ml-2">
                       {formatTime(session.lastTime ?? session.createdAt)}
                     </div>
                   </div>
@@ -467,7 +467,7 @@ export default function AdminChatsPage() {
                 </div>
 
                 {session.unreadCount > 0 && !isActive && (
-                  <div className="bg-zinc-900 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0 border border-white">
+                  <div className="bg-zinc-900 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0">
                     {session.unreadCount}
                   </div>
                 )}
@@ -492,7 +492,7 @@ export default function AdminChatsPage() {
                     {selectedSession.fullName || "Anonymous User"}
                   </div>
                   {selectedSession.email && (
-                    <div className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-wider">
+                    <div className="text-xs text-zinc-400 mt-1">
                       {selectedSession.email}
                     </div>
                   )}
@@ -501,7 +501,7 @@ export default function AdminChatsPage() {
 
               <button
                 onClick={handleCloseSession}
-                className="text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-lg border border-zinc-200 text-zinc-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all"
+                className="text-xs font-medium px-4 py-2 rounded-lg border border-zinc-200 text-zinc-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all"
               >
                 Close Session
               </button>
@@ -524,7 +524,7 @@ export default function AdminChatsPage() {
                   <div key={msg.id}>
                     {showDateSeparator && (
                       <div className="flex justify-center my-8">
-                        <div className="px-3 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-100 rounded-md border border-zinc-200">
+                        <div className="px-3 py-1 text-xs font-medium text-zinc-500 bg-zinc-100 rounded-md border border-zinc-200">
                           {formatDateLabel(msg.createdAt)}
                         </div>
                       </div>
@@ -553,13 +553,13 @@ export default function AdminChatsPage() {
                                 <div className="w-56 bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
                                   <img src={msg.metadata?.thumbnail} className="w-full h-32 object-cover" />
                                   <div className="p-3">
-                                    <div className="font-bold text-xs text-zinc-900 line-clamp-1">{msg.metadata?.name}</div>
-                                    <div className="text-[10px] font-bold text-zinc-400 uppercase mt-0.5">{msg.metadata?.brandName}</div>
-                                    <div className="text-zinc-900 font-bold text-xs mt-1.5">{msg.metadata?.price?.toLocaleString()}₫</div>
+                                    <div className="font-semibold text-xs text-zinc-900 line-clamp-1">{msg.metadata?.name}</div>
+                                    <div className="text-[10px] text-zinc-500 mt-0.5">{msg.metadata?.brandName}</div>
+                                    <div className="text-zinc-900 font-semibold text-xs mt-1.5">{msg.metadata?.price?.toLocaleString()}₫</div>
                                     <a
                                       href={`/products/${msg.metadata?.slug}`}
                                       target="_blank"
-                                      className="mt-3 block text-center bg-zinc-900 text-white text-[10px] font-bold py-1.5 rounded uppercase tracking-wider hover:bg-zinc-800 transition-colors"
+                                      className="mt-3 block text-center bg-zinc-900 text-white text-xs py-2 rounded-lg hover:bg-zinc-800 transition-colors"
                                     >
                                       View Item
                                     </a>
@@ -573,10 +573,10 @@ export default function AdminChatsPage() {
                           }
                         })()}
 
-                        <div className={`text-[9px] font-bold mt-2 flex items-center justify-end uppercase tracking-widest ${isAgent ? "text-zinc-400/80" : "text-zinc-400"}`}>
+                        <div className={`text-[10px] mt-2 flex items-center justify-end ${isAgent ? "text-zinc-400" : "text-zinc-400"}`}>
                           {formatTime(msg.createdAt)}
                           {isAgent && index === lastAgentIndex && msg.isRead && (
-                            <span className="ml-2 font-black">• Seen</span>
+                            <span className="ml-2 font-medium">• Seen</span>
                           )}
                         </div>
                       </div>
@@ -591,19 +591,19 @@ export default function AdminChatsPage() {
               <div className="px-6 py-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <img src={previewImage} className="w-16 h-16 object-cover rounded-lg border border-zinc-200 shadow-sm" />
-                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Ready to send attachment</p>
+                  <p className="text-xs text-zinc-500">Ready to send attachment</p>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => { setPreviewImage(null); setSelectedFile(null); }}
-                    className="px-4 py-2 text-xs font-bold text-zinc-500 hover:text-zinc-900 transition-colors uppercase tracking-widest"
+                    className="px-4 py-2 text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSendImage}
                     disabled={uploading}
-                    className="bg-zinc-900 text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-zinc-800 disabled:opacity-40 transition-all uppercase tracking-widest"
+                    className="bg-zinc-900 text-white px-5 py-2 rounded-lg text-xs font-medium hover:bg-zinc-800 disabled:opacity-40 transition-all"
                   >
                     {uploading ? "Uploading..." : "Send Attachment"}
                   </button>
@@ -627,21 +627,21 @@ export default function AdminChatsPage() {
                     >
                       <img src={product.thumbnail} className="w-12 h-12 object-cover rounded-lg border border-zinc-200" />
                       <div className="flex-1">
-                        <div className="text-xs font-bold text-zinc-900">{product.name}</div>
-                        <div className="text-[10px] font-bold text-zinc-400 uppercase">{product.brandName}</div>
-                        <div className="text-xs font-bold text-zinc-900 mt-0.5">{(product.salePrice ?? product.originalPrice)?.toLocaleString()}₫</div>
+                        <div className="text-sm font-medium text-zinc-900">{product.name}</div>
+                        <div className="text-xs text-zinc-500">{product.brandName}</div>
+                        <div className="text-sm font-semibold text-zinc-900 mt-1">{(product.salePrice ?? product.originalPrice)?.toLocaleString()}₫</div>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-              <div className="flex items-center gap-3 bg-zinc-100 rounded-xl px-4 py-2 border border-zinc-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-zinc-900 transition-all">
+              <div className="flex items-center gap-3 bg-zinc-50 rounded-2xl px-4 py-2.5 border border-zinc-200 focus-within:bg-white focus-within:border-zinc-400 focus-within:ring-4 focus-within:ring-zinc-900/5 transition-all">
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="p-1.5 text-zinc-400 hover:text-zinc-900 transition-colors"
                   title="Upload Image"
                 >
-                  <Image size={18} />
+                  <Image size={20} />
                 </button>
 
                 <input
@@ -673,14 +673,14 @@ export default function AdminChatsPage() {
                     }
                   }}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
-                  placeholder="Type a message or use /sp to search products..."
-                  className="flex-1 bg-transparent border-none text-sm focus:ring-0 placeholder:text-zinc-400"
+                  placeholder="Type a message or use /sp to search..."
+                  className="flex-1 bg-transparent border-0 outline-none ring-0 focus:ring-0 text-sm py-2 placeholder:text-zinc-400"
                 />
 
                 <button
                   onClick={handleSend}
                   disabled={!input.trim()}
-                  className="text-xs font-bold uppercase tracking-widest text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed hover:text-zinc-600 transition-colors"
+                  className="text-sm font-semibold text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed hover:text-zinc-600 transition-colors px-2"
                 >
                   Send
                 </button>

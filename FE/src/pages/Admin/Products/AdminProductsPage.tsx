@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Plus, MoreVertical, Edit2, Trash2, RotateCcw, Eye } from "lucide-react";
+import { Search, Plus, MoreVertical, Edit2, Trash2, X, RotateCcw, Eye } from "lucide-react";
 import { adminProductApi } from "@/features/admin/api/adminProductApi";
 import { adminBrandApi } from "@/features/admin/api/adminBrandApi";
 import { useCategoryTree } from "@/hooks/useCategoryTree";
@@ -90,7 +90,7 @@ const AdminProductsPage = () => {
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       // 1. Search Keyword (Name or slug)
-      const matchesSearch = !search.trim() || 
+      const matchesSearch = !search.trim() ||
         p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.slug?.toLowerCase().includes(search.toLowerCase());
 
@@ -210,16 +210,15 @@ const AdminProductsPage = () => {
       key: "isActive",
       header: "Status",
       render: (p) => (
-        <div 
+        <div
           onClick={(e) => {
             e.stopPropagation();
             handleToggleStatus(p.id, p.isActive);
           }}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all ${
-            p.isActive 
-              ? "bg-green-50 text-green-700 hover:bg-green-100" 
-              : "bg-rose-50 text-rose-600 hover:bg-rose-100"
-          }`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all ${p.isActive
+            ? "bg-green-50 text-green-700 hover:bg-green-100"
+            : "bg-rose-50 text-rose-600 hover:bg-rose-100"
+            }`}
         >
           <div className={`w-1.5 h-1.5 rounded-full ${p.isActive ? "bg-green-500" : "bg-rose-500"}`} />
           {p.isActive ? "Active" : "Inactive"}
@@ -232,36 +231,36 @@ const AdminProductsPage = () => {
       align: "right",
       render: (p) => (
         <div className="flex items-center justify-end gap-1">
-          <button 
+          <button
             onClick={(e) => { e.stopPropagation(); navigate(`/admin/products/${p.id}`); }}
-            className="p-2 hover:bg-zinc-100 rounded-lg transition text-zinc-400 hover:text-zinc-900" 
+            className="p-2 hover:bg-zinc-100 rounded-lg transition text-zinc-400 hover:text-zinc-900"
           >
             <Eye size={16} />
           </button>
-          <button 
+          <button
             onClick={(e) => { e.stopPropagation(); handleEdit(p); }}
-            className="p-2 hover:bg-zinc-100 rounded-lg transition text-zinc-400 hover:text-zinc-900" 
+            className="p-2 hover:bg-zinc-100 rounded-lg transition text-zinc-400 hover:text-zinc-900"
           >
             <Edit2 size={16} />
           </button>
-          
+
           <div className="group relative">
             <button className="p-2 hover:bg-zinc-100 rounded-lg transition text-zinc-400">
               <MoreVertical size={16} />
             </button>
             <div className="absolute right-0 top-full mt-1 w-44 bg-white shadow-2xl rounded-xl border border-zinc-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
-               {p.deletedAt ? (
-                 <button onClick={(e) => { e.stopPropagation(); }} className="w-full text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-green-600 hover:bg-green-50 flex items-center gap-2">
-                   <RotateCcw size={14} /> Restore
-                 </button>
-               ) : (
-                 <button onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }} className="w-full text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 flex items-center gap-2">
-                   <Trash2 size={14} /> Soft Delete
-                 </button>
-               )}
-               <button onClick={(e) => { e.stopPropagation(); handleHardDelete(p.id); }} className="w-full text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-rose-600 hover:bg-rose-50 border-t border-zinc-100 flex items-center gap-2">
-                 <Trash2 size={14} /> Permanent Delete
-               </button>
+              {p.deletedAt ? (
+                <button onClick={(e) => { e.stopPropagation(); }} className="w-full text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-green-600 hover:bg-green-50 flex items-center gap-2">
+                  <RotateCcw size={14} /> Restore
+                </button>
+              ) : (
+                <button onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }} className="w-full text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 flex items-center gap-2">
+                  <Trash2 size={14} /> Soft Delete
+                </button>
+              )}
+              <button onClick={(e) => { e.stopPropagation(); handleHardDelete(p.id); }} className="w-full text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-rose-600 hover:bg-rose-50 border-t border-zinc-100 flex items-center gap-2">
+                <Trash2 size={14} /> Permanent Delete
+              </button>
             </div>
           </div>
         </div>
@@ -321,16 +320,16 @@ const AdminProductsPage = () => {
         </div>
       </div>
 
-      <DataTable 
+      <DataTable
         data={filteredProducts}
         columns={columns}
         loading={loading}
         onRowClick={(p) => navigate(`/admin/products/${p.id}`)}
         emptyMessage={
           <div className="py-10 flex flex-col items-center gap-3">
-             <div className="text-zinc-300"><Search size={48} /></div>
-             <p className="text-zinc-500 font-medium">No results found for your criteria</p>
-             <Button variant="ghost" onClick={() => { setSearch(""); setFilterBrand(""); setFilterCategory(""); setFilterStatus(""); }} className="text-blue-600 text-[10px] font-bold uppercase tracking-widest underline">Clear all Filters</Button>
+            <div className="text-zinc-300"><Search size={48} /></div>
+            <p className="text-zinc-500 font-medium">No results found for your criteria</p>
+            <Button variant="ghost" onClick={() => { setSearch(""); setFilterBrand(""); setFilterCategory(""); setFilterStatus(""); }} className="text-blue-600 text-[10px] font-bold uppercase tracking-widest underline">Clear all Filters</Button>
           </div>
         }
       />
@@ -339,62 +338,62 @@ const AdminProductsPage = () => {
         <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-8 relative overflow-y-auto max-h-[96vh] animate-in zoom-in-95 duration-200 border border-zinc-200 focus:outline-none">
             <div className="flex justify-between items-center mb-8 border-b pb-4">
-                <h2 className="text-sm font-bold text-zinc-900 uppercase tracking-widest tracking-[0.15em]">
+              <h2 className="text-sm font-bold text-zinc-900 uppercase tracking-widest tracking-[0.15em]">
                 {editingId ? "Update Product" : "New Collection Item"}
-                </h2>
-                <button onClick={() => setOpenModal(false)} className="text-zinc-400 hover:text-zinc-900 transition-colors">
-                    <Trash2 size={20} className="rotate-45" />
-                </button>
+              </h2>
+              <button onClick={() => setOpenModal(false)} className="text-zinc-400 hover:text-zinc-900 transition-colors">
+                <X size={20} />
+              </button>
             </div>
 
             <div className="grid md:grid-cols-2 gap-10">
               <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-1">Product Title</label>
-                  <Input name="name" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="bg-zinc-50 border-zinc-100 rounded-xl py-6 font-medium" />
+                  <Input name="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="bg-zinc-50 border-zinc-100 rounded-xl py-6 font-medium" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-1">Global Class</label>
-                    <select value={form.categoryId} onChange={(e) => setForm({...form, categoryId: e.target.value})} className="w-full bg-zinc-50 border-none rounded-xl px-4 py-3.5 text-[10px] font-bold uppercase tracking-widest focus:ring-2 focus:ring-zinc-900 cursor-pointer">
+                    <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="w-full bg-zinc-50 border-none rounded-xl px-4 py-3.5 text-[10px] font-bold uppercase tracking-widest focus:ring-2 focus:ring-zinc-900 cursor-pointer">
                       <option value="">Category</option>
                       {allCategoryOptions.map(cat => <option key={cat.id} value={cat.id}>{"- ".repeat(cat.level)}{cat.name}</option>)}
                     </select>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-1">House Label</label>
-                    <select value={form.brandId} onChange={(e) => setForm({...form, brandId: e.target.value})} className="w-full bg-zinc-50 border-none rounded-xl px-4 py-3.5 text-[10px] font-bold uppercase tracking-widest focus:ring-2 focus:ring-zinc-900 cursor-pointer">
+                    <select value={form.brandId} onChange={(e) => setForm({ ...form, brandId: e.target.value })} className="w-full bg-zinc-50 border-none rounded-xl px-4 py-3.5 text-[10px] font-bold uppercase tracking-widest focus:ring-2 focus:ring-zinc-900 cursor-pointer">
                       <option value="">Brand</option>
                       {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-1">Asset Reference URL</label>
-                    <Input value={form.thumbnailUrl} onChange={(e) => setForm({...form, thumbnailUrl: e.target.value})} className="bg-zinc-50 border-zinc-100 rounded-xl py-6 text-[11px]" />
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-1">Asset Reference URL</label>
+                  <Input value={form.thumbnailUrl} onChange={(e) => setForm({ ...form, thumbnailUrl: e.target.value })} className="bg-zinc-50 border-zinc-100 rounded-xl py-6 text-[11px]" />
                 </div>
               </div>
               <div className="space-y-6">
-                 <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-1 text-center">Visual Prototype</div>
-                 <div className="aspect-square bg-zinc-50 rounded-2xl border-2 border-dashed border-zinc-200 flex items-center justify-center overflow-hidden">
-                    {form.thumbnailUrl ? (
-                      <img src={form.thumbnailUrl} alt="Preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <Plus size={32} className="text-zinc-200" />
-                    )}
-                 </div>
+                <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-1 text-center">Visual Prototype</div>
+                <div className="aspect-square bg-zinc-50 rounded-2xl border-2 border-dashed border-zinc-200 flex items-center justify-center overflow-hidden">
+                  {form.thumbnailUrl ? (
+                    <img src={form.thumbnailUrl} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <Plus size={32} className="text-zinc-200" />
+                  )}
+                </div>
               </div>
               <div className="col-span-2 space-y-2">
                 <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest px-1">Item Narrative</label>
-                <textarea value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} rows={4} className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-zinc-900 min-h-[120px]" />
+                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-zinc-900 min-h-[120px]" />
               </div>
             </div>
 
             <div className="flex justify-end gap-3 mt-10">
-               <Button variant="outline" onClick={() => setOpenModal(false)} className="px-8 text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Abort</Button>
-               <Button variant="primary" onClick={handleSubmit} disabled={creating} className="px-10 text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-zinc-100">
-                 {creating ? "Saving..." : editingId ? "Update Item" : "Publish Item"}
-               </Button>
+              <Button variant="outline" onClick={() => setOpenModal(false)} className="px-8 text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Abort</Button>
+              <Button variant="primary" onClick={handleSubmit} disabled={creating} className="px-10 text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-zinc-100">
+                {creating ? "Saving..." : editingId ? "Update Item" : "Publish Item"}
+              </Button>
             </div>
           </div>
         </div>
