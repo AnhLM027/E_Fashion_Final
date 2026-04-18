@@ -20,7 +20,7 @@ pipeline:
 profiles:
   gemini_cloud:
     provider: "gemini"
-    api_key: "AIzaSyAxTTfo92WdcFuIEEfKDWZ0wlA9aPjKxrE"
+    api_key: ""
     model: "gemini-2.5-flash"
     model_fast: "gemini-2.5-flash"
     embedding_provider: "sentence_transformers"
